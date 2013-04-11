@@ -32,7 +32,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'nocdn/',
-          src: ['**/*.{css,js}'],
+          src: ['**/*.{css,js}', '!src/stubs.js'],
           dest: 'dist/nocdn/'
         }]
       },
@@ -61,7 +61,7 @@ module.exports = function (grunt) {
         options: {
           pretty: true,
           data: {
-            store: 'http://movies.store.localhost:1275'
+            store: 'https://movies.store.localhost:1276'
           }},
         files: [{
           expand: true,
@@ -82,7 +82,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'src/',
-          src: ['**/*.jade'],
+          src: ['**/*.jade', '!src/authstub.jade'],
           dest: 'dist/',
           ext: '.html'
         }]
@@ -92,7 +92,7 @@ module.exports = function (grunt) {
         options: {
           data: {
             prod: true,
-            store: 'http://movies.store.localhost:1275'
+            store: 'https://movies.store.localhost:1276'
           }},
         files: [{
           expand: true,
@@ -110,6 +110,7 @@ module.exports = function (grunt) {
         globalstrict: true,
         globals: {
           angular: true,
+          console: true,
           store: true
         },
         jquery: true
@@ -120,7 +121,7 @@ module.exports = function (grunt) {
         separator: ';'
       },
       dist: {
-        src: ['src/**/*.js'],
+        src: ['src/**/*.js', '!src/stubs.js'],
         dest: 'dist/<%= pkg.name %>.js'
       },
       stage: {

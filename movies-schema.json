@@ -35,7 +35,20 @@
         role:   {handle: h20AA, type: string, nullable: false}},
 
       keys: {
-        id: {handle: hFD81, columns: [actor, movie]}}}},
+        id: {handle: hFD81, columns: [actor, movie]}}},
+
+    user: {
+      handle: user,
+
+      columns: {
+        id: {handle: id, type: user.identity, nullable: false, modifiable: false},
+        email: {handle: email, type: string},
+        firstName: {handle: firstName, type: string},
+        lastName: {handle: lastName, type: string},
+        isEditor: {handle: h5C8C, type: boolean, nullable: false, default: true}},
+
+      keys: {
+        id: {handle: id, columns: [id]}}}},
 
   documents: {
 
@@ -93,12 +106,41 @@
       "with movie {
         id: id;
         title: title;
+      }",
+
+    userDetail:
+      "with user {
+        id: id;
+        email: email;
+        firstName: firstName;
+        lastName: lastName;
+        isEditor: isEditor;
+      }",
+
+    userKey:
+      "with user {
+        id: id;
+      }",
+
+    userTerms:
+      "(CA38) with user {
+        email: email;
+        firstName: firstName;
+        lastName: lastName;
+        isEditor: isEditor;
       }"
   },
 
   hosts: {
 
     movies.store.localhost: {
+
+      write: "user.isEditor",
+
+      trust: {
+        facebook: ["173056026179982"],
+        google: ["1068154921504.apps.googleusercontent.com"]
+      },
 
       resources: [
 
@@ -132,7 +174,21 @@
           search: {
             categories: {
               actors: {terms: actorTerms, result: actorSummary},
-              movies: {terms: movieTerms, result: movieSummary}}}}
+              movies: {terms: movieTerms, result: movieSummary}}}},
+
+        { prefix: "/user",
+          table: user,
+          document: userDetail,
+          key: {name: id, document: userKey, template: "/<id>", pattern: "/(?<id>.+)$"},
+          allow: "user.isEditor",
+          get: {},
+          getme: {},
+          search: {
+            categories: {
+              users: {terms: userTerms, result: userDetail}}},
+          put: {},
+          deleteme: {}
+        }
       ]}
   }}
 

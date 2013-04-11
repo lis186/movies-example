@@ -15,7 +15,7 @@
 
 'use strict';
 
-angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
+angular.module ("movies")
 
   .config (["$routeProvider", function ($routeProvider) {
 
@@ -50,6 +50,32 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
     $routeProvider.otherwise ({redirectTo: "/"});
   }])
 
+  .config (["TreodeAuthorizationProvider", function (Auth) {
+
+    function patch0 (dest, src) {
+      for (var i in src) {
+        dest[i] = src[i];
+      }}
+
+    function patch1 (dest, src) {
+      for (var i in src) {
+        dest[i] = dest[i] || {};
+        patch0 (dest[i], src[i]);
+      }}
+
+    Auth.redirectUri = "http://localhost:8001/oauth.html";
+
+    patch0 (Auth.clientIds, {
+      facebook: "458665407499863",
+      google: "1040679760935.apps.googleusercontent.com"
+    });
+
+    patch1 (Auth.authorities, {
+      facebook: {displayName: "Facebook"},
+      google:   {displayName: "Google"}
+    });
+  }])
+
   .factory ("Actor", ["TreodeResource", function (Resource) {
     return new Resource (store + "/actor", "/:actorId");
   }])
@@ -60,6 +86,10 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
 
   .factory ("Search", ["TreodeResource", function (Resource) {
     return new Resource (store + "/search");
+  }])
+
+  .factory ("User", ["TreodeResource", function (Resource) {
+    return new Resource (store + "/user", null, true);
   }])
 
   .controller ("AlertsCtrl", [
@@ -95,6 +125,17 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
       };
     }])
 
+  .controller ('LoginCtrl', [
+    '$scope', 'TreodeAuthorization',
+    function ($scope, Auth) {
+
+      $scope.authorities = Auth.authorities;
+
+      $scope.select = function (name) {
+        Auth.selectAuthority (name);
+      };
+    }])
+
   .controller ("NavbarSearchCtrl", [
     "$scope", "$location",
     function ($scope, $location) {
@@ -122,4 +163,19 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
         $scope.results = Search.search (params.q, noop, error);
       else
         $location.url ("/");
-   }]);
+   }])
+
+  .run ([
+    "$rootScope", "TreodeAuthorization", "User",
+    function ($rootScope, Auth, User) {
+
+      $rootScope.user = {};
+
+      $rootScope.logoffMovies = function() {
+        $rootScope.user = {};
+      };
+
+      $rootScope.$on ("authorizationChanged", function (event, details) {
+        $rootScope.user = User.getme();
+      });
+    }]);

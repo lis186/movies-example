@@ -54,7 +54,7 @@ div
     .span2
     .span8
       i No roles
-  .row-fluid
+  .row-fluid(ng-show="user.isEditor")
     .span12
       form.form-horizontal
         .form-actions(ng-show="editing")

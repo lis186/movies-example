@@ -33,7 +33,7 @@ body
     .navbar-inner
       .container-fluid
         a.brand(href="#") Movies Navigator
-        ul.nav(role="navigation")
+        ul.nav(role="navigation", ng-show="user.isEditor")
           li.dropdown
             a#addDrop.dropdown-toggle(href="#", role="button", data-toggle="dropdown")
               | Add
@@ -47,6 +47,18 @@ body
         span.pull-right
           form.navbar-search(ng-controller="NavbarSearchCtrl", ng-submit="search()")
             input.search-query(type="text", placeholder="Search", ng-model="query")
+          ul.nav.pull-right(ng-controller="LoginCtrl")
+            li.dropdown(ng-show="user.firstName")
+              a#logoutDrop.dropdown-toggle(href="#", data-toggle="dropdown")
+                | Hello {{user.firstName}}
+              ul.dropdown-menu.pull-right
+                li: a(ng-click="logoffMovies()") Logoff Movies
+            li.dropdown(ng-hide="user.firstName")
+              a#loginDrop.dropdown-toggle(href="#", data-toggle="dropdown")
+                | Logon
+              ul.dropdown-menu.pull-right
+                li(ng-repeat="a in authorities | orderBy: 'displayName'")
+                  a(ng-click="select(a.prefix)") {{a.displayName}}
   .container-fluid
     div(ng-controller="AlertsCtrl")
       .row-fluid(ng-repeat="a in alerts")
@@ -68,6 +80,8 @@ body
     script(src="nocdn/angular-ui.min.js")
     script(src="//ivaynberg.github.com/select2/select2-3.2/select2.js")
     script(src="nocdn/treode-angular.js")
+    script
+      angular.module ("movies", ["treode", "ui", "ui.bootstrap"]);
     script(src="movies.min.js")
   - else
     script(src="jquery/1.9.1/jquery.js")
@@ -79,6 +93,9 @@ body
     script(src="angular-ui/0.3.2/angular-ui.js")
     script(src="select2/3.2/select2.js")
     script(src="treode-angular/0.1/js/treode-angular.js")
+    script
+      angular.module ("movies", ["treode", "ui", "ui.bootstrap"]);
     script(src="movies.js")
+    script(src="stubs.js")
     script(src="view/actor.js")
     script(src="view/movie.js")

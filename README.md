@@ -37,7 +37,7 @@ Grunt leaves the result in the directory `dist`.
 There are several versions of this example that show how Treode can support different features in
 the user interface:
 
-* Basic Modal Application *(You are currently viewing this branch)*
+* Basic Modal Application
 
   The basic modal application is on the [modal branch][source-modal].  This UI presents a movie or
   actor in read mode, and offers and "Edit" button to switch to an edit mode.  Information about the
@@ -58,7 +58,7 @@ the user interface:
   endpoint.  The second half of the [modeless&nbsp;tutorial][tutorial-modeless] discusses this
   variation.
 
-* Authorizing Application
+* Authorizing Application *(You are currently viewing this branch)*
 
   The authenticating and authorizing application is on the [auth branch][source-auth].  This UI
   allows any user to navigate movies and actors.  To edit data, it requires that a user signin,

@@ -1,0 +1,72 @@
+//-
+  Copyright 2013 Treode, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+doctype 5
+html(lang="en")
+head
+  meta(charset="utf-8")
+  - if (locals.prod)
+    link(rel="stylesheet", href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css")
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js")
+  - else
+    link(rel="stylesheet", href="/bootstrap/2.2.2/css/bootstrap.css")
+    script(src="/jquery/1.9.1/jquery.js")
+  title Authorization Stub
+  style
+
+    .btn-login {
+      display: block;
+      margin: 3px;
+      width: 10em;
+    }
+
+  script
+
+    function unparam (src) {
+      var args = {};
+      var strs = src.split ("&");
+      for (var i in strs) {
+        var s = strs [i];
+        if (s.indexOf ("=") < 0) {
+          args [decodeURIComponent (s)] = true;
+        } else {
+          var kv = s.split ("=");
+          args [decodeURIComponent (kv [0])] = decodeURIComponent (kv [1]);
+        }}
+      return args;
+    }
+
+    var errors = {
+      not_authorized: true
+    };
+
+    function choose (id) {
+      var args = unparam (window.location.search.substring(1));
+      var result = {};
+      if (args.state) result.state = args.state;
+      if (errors [id]) {
+        result.error = id;
+        window.location = args.redirect_uri + "#" + $.param (result);
+      } else {
+        result.access_token = id;
+        result.expires_in = 3600;
+        window.location = args.redirect_uri + "#" + $.param (result);
+      }}
+
+body
+  a.btn.btn-login(onClick="choose ('Alice.Liddell')") Alice
+  a.btn.btn-login(onClick="choose ('Bob.Smith')") Bob
+  a.btn.btn-login(onClick="choose ('Mallory.Meanie')") Mallory
+  a.btn.btn-login(onClick="choose ('not_authorized')") Cancel
