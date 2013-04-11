@@ -22,12 +22,6 @@ angular.module ("movies")
     function ($scope, $location, $routeParams, Actor) {
 
       var noop = angular.noop;
-      var backup = null;
-
-      var created = function (location, response) {
-        if (location)
-          $location.url (location);
-      };
 
       var removed = function (response) {
         $location.url ("/");
@@ -40,38 +34,10 @@ angular.module ("movies")
       $scope.newRole = {};
       $scope.newRoleMovieId = "";
 
-      if ($routeParams.actorId) {
-        $scope.actor = Actor.get ({actorId: $routeParams.actorId}, noop, error);
-        $scope.editing = false;
-      } else {
-        $scope.actor = {roles: []};
-        $scope.editing = true;
-      }
-
-      $scope.edit = function() {
-        backup = $scope.actor;
-        $scope.editing = true;
-      };
+      $scope.actor = Actor.get ({actorId: $routeParams.actorId}, noop, error);
 
       $scope.remove = function() {
         Actor.remove ({actorId: $scope.actor.id}, removed, error);
-      };
-
-      $scope.save = function() {
-        if ($scope.actor.id)
-          Actor.put ({actorId: $scope.actor.id}, $scope.actor, noop, error);
-        else
-          Actor.post ($scope.actor, created, error);
-        $scope.editing = false;
-      };
-
-      $scope.cancel = function() {
-        if (backup) {
-          $scope.actor = backup;
-        } else {
-          $location.url ("/");
-        }
-        $scope.editing = false;
       };
 
       $scope.suggestMovie = function (index) {
@@ -102,14 +68,59 @@ angular.module ("movies")
           }};
       };
 
+      $scope.changeName = function() {
+        Actor.put ({actorId: $scope.actor.id}, {name: $scope.actor.name}, noop, error);
+      };
+
       $scope.addRole = function() {
         var r = $scope.newRole;
+        Actor.put (
+          {actorId: $scope.actor.id},
+          {roles: {save: [{movieId: r.movieId, role: r.role}]}},
+          noop,
+          error);
         $scope.actor.roles.push (r);
         $scope.newRole = {};
         $scope.newRoleMovieId = "";
       };
 
+      $scope.gotoRoleMovie = function (index) {
+        var r = $scope.actor.roles [index];
+        $location.url ("/movie/" + r.movieId);
+      };
+
+      $scope.changeRoleMovie = function (index) {
+        return function (previous) {
+          var r = $scope.actor.roles [index];
+          Actor.put (
+            {actorId: $scope.actor.id},
+            {roles: {
+               save: [{movieId: r.movieId, role: r.role}],
+               remove: [{movieId: previous}]
+             }},
+            noop,
+            error);
+        };
+      };
+
+      $scope.changeRoleName = function (index) {
+        var r = $scope.actor.roles [index];
+        Actor.put (
+          {actorId: $scope.actor.id},
+          {roles: {
+              save: [{movieId: r.movieId, role: r.role}]
+          }},
+          noop,
+          error);
+      };
+
       $scope.removeRole = function (index) {
+        var r = $scope.actor.roles [index];
+        Actor.put (
+          {actorId: $scope.actor.id},
+          {roles: {remove: [{movieId: r.movieId}]}},
+          noop,
+          error);
         $scope.actor.roles.splice (index, 1);
       };
     }]);

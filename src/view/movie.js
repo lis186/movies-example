@@ -22,12 +22,6 @@ angular.module ("movies")
     function ($scope, $location, $routeParams, Movie) {
 
       var noop = angular.noop;
-      var backup = null;
-
-      var created = function (location, response) {
-        if (location)
-          $location.url (location);
-      };
 
       var removed = function (response) {
         $location.url ("/");
@@ -40,38 +34,10 @@ angular.module ("movies")
       $scope.newCast = {};
       $scope.newCastActorId = "";
 
-      if ($routeParams.movieId) {
-        $scope.movie = Movie.get ({movieId: $routeParams.movieId}, noop, error);
-        $scope.editing = false;
-      } else {
-        $scope.movie = {cast: []};
-        $scope.editing = true;
-      }
-
-      $scope.edit = function() {
-        backup = $scope.movie;
-        $scope.editing = true;
-      };
+      $scope.movie = Movie.get ({movieId: $routeParams.movieId}, noop, error);
 
       $scope.remove = function() {
-        Movie.remove ({movieId: $scope.movie.id}, removed, error);
-      };
-
-      $scope.save = function() {
-        if ($scope.movie.id)
-          Movie.put ({movieId: $scope.movie.id}, $scope.movie, created, error);
-        else
-          Movie.post ($scope.movie, created, error);
-        $scope.editing = false;
-      };
-
-      $scope.cancel = function() {
-        if (backup) {
-          $scope.movie = backup;
-        } else {
-          $location.url ("/");
-        }
-        $scope.editing = false;
+        Movie.remove ({movieId: $scope.movie.id}, removed, error (true));
       };
 
       $scope.suggestActor = function (index) {
@@ -102,14 +68,59 @@ angular.module ("movies")
           }};
       };
 
+      $scope.changeTitle = function() {
+        Movie.put ({movieId: $scope.movie.id}, {title: $scope.movie.title}, noop, error);
+      };
+
       $scope.addCast = function() {
-        var r = $scope.newCast;
-        $scope.movie.cast.push (r);
+        var c = $scope.newCast;
+        Movie.put (
+          {movieId: $scope.movie.id},
+          {cast: {save: [{actorId: c.actorId, role: c.role}]}},
+          noop,
+          error);
+        $scope.movie.cast.push (c);
         $scope.newCast = {};
         $scope.newCastActorId = "";
       };
 
+      $scope.gotoCastActor = function (index) {
+        var c = $scope.movie.cast [index];
+        $location.url ("/actor/" + c.actorId);
+      };
+
+      $scope.changeCastActor = function (index) {
+        return function (previous) {
+          var c = $scope.movie.cast [index];
+          Movie.put (
+            {movieId: $scope.movie.id},
+            {cast: {
+               save: [{actorId: c.actorId, role: c.role}],
+               remove: [{actorId: previous}]
+             }},
+            noop,
+            error);
+        };
+      };
+
+      $scope.changeCastRole = function (index) {
+        var c = $scope.movie.cast [index];
+        Movie.put (
+          {movieId: $scope.movie.id},
+          {cast: {
+              save: [{actorId: c.actorId, role: c.role}]
+          }},
+          noop,
+          error);
+      };
+
       $scope.removeCast = function (index) {
+        var c = $scope.movie.cast [index];
+        Movie.put (
+          {movieId: $scope.movie.id},
+          {cast: {remove: [{actorId: c.actorId}]}},
+          noop,
+          error);
         $scope.movie.cast.splice (index, 1);
       };
     }]);

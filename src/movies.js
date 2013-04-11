@@ -95,6 +95,27 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
       };
     }])
 
+  .controller ("NavbarMenusCtrl", [
+    "$scope", "$location", "Movie", "Actor",
+    function ($scope, $location, Movie, Actor) {
+
+      var created = function (location, response) {
+        $location.url (location);
+      };
+
+      var error = function (response) {
+        $scope.emit ("raiseAlert", response);
+      };
+
+      $scope.addMovie = function() {
+        Movie.post ({title: "Working Title"}, created, error);
+      };
+
+      $scope.addActor = function() {
+        Actor.post ({name: "Anonymous"}, created, error);
+      };
+    }])
+
   .controller ("NavbarSearchCtrl", [
     "$scope", "$location",
     function ($scope, $location) {
@@ -122,4 +143,36 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
         $scope.results = Search.search (params.q, noop, error);
       else
         $location.url ("/");
-   }]);
+   }])
+
+  .directive ('onBlurChange', function() {
+    return {
+      restrict: 'A',
+      link: function (scope, elem, attrs) {
+        var save = null;
+        elem.bind ('focus', function() {
+          save = elem.val();
+        });
+        elem.bind ('blur', function() {
+          if (elem.val() != save)
+            scope.$apply (attrs.onBlurChange);
+          save = null;
+        });
+      }};
+    })
+
+  .directive ("onSelect2Change", function() {
+    return {
+      link: function (scope, elem, attrs) {
+        var save = null;
+        elem.on ('open', function (event) {
+          save = elem.val();
+        });
+        elem.on ('change', function (event) {
+          scope.$apply (function () {
+            scope.$eval (attrs.onSelect2Change) (save);
+            save = null;
+          });
+        });
+      }};
+    });

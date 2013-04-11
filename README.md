@@ -37,14 +37,14 @@ Grunt leaves the result in the directory `dist`.
 There are several versions of this example that show how Treode can support different features in
 the user interface:
 
-* Basic Modal Application *(You are currently viewing this branch)*
+* Basic Modal Application
 
   The basic modal application is on the [modal branch][source-modal].  This UI presents a movie or
   actor in read mode, and offers and "Edit" button to switch to an edit mode.  Information about the
   RESTful/JSON interface exported by the Treode storage service is available in the
   [modal&nbsp;tutorial][tutorial-modal].
 
-* Modeless Application, V1
+* Modeless Application, V1 *(You are currently viewing this branch)*
 
   The modeless application is on the [modeless branch][source-modeless].  This UI always presents
   movies and actors in an edit mode.  The Treode configuration for this application is identical to

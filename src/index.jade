@@ -33,7 +33,7 @@ body
     .navbar-inner
       .container-fluid
         a.brand(href="#") Movies Navigator
-        ul.nav(role="navigation")
+        ul.nav(ng-controller="NavbarMenusCtrl", role="navigation")
           li.dropdown
             a#addDrop.dropdown-toggle(href="#", role="button", data-toggle="dropdown")
               | Add
@@ -41,9 +41,9 @@ body
               b.caret
             ul.dropdown-menu(role="menu", aria-labelledby="addDrop")
               li
-                a#addMovie(href="#/add-movie") Movie
+                a#addMovie(ng-click="addMovie()") Movie
               li
-                a#addActor(href="#/add-actor") Actor
+                a#addActor(ng-click="addActor()") Actor
         span.pull-right
           form.navbar-search(ng-controller="NavbarSearchCtrl", ng-submit="search()")
             input.search-query(type="text", placeholder="Search", ng-model="query")
