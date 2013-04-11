@@ -44,14 +44,14 @@ the user interface:
   RESTful/JSON interface exported by the Treode storage service is available in the
   [modal&nbsp;tutorial][tutorial-modal].
 
-* Modeless Application, V1 *(You are currently viewing this branch)*
+* Modeless Application, V1
 
   The modeless application is on the [modeless branch][source-modeless].  This UI always presents
   movies and actors in an edit mode.  The Treode configuration for this application is identical to
   that for the modal application; additional information about the RESTful/JSON interface exported
   by the Treode storage service is available in the [modeless&nbsp;tutorial][tutorial-modeless].
 
-* Modeless Application, V2
+* Modeless Application, V2 *(You are currently viewing this branch)*
 
   The second modeless application is on the [cast branch][source-cast].  This UI is identical to
   version 1 as far as the user can tell, however the Treode configuration includes an additional

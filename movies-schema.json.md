@@ -1,11 +1,12 @@
-# Supporting a Modeless UI
+# Handling a Composite Key of References
 
 This file is part of a series of examples which starts with a
-[basic&nbsp;modal&nbsp;application][schema-modal].  This example builds on that; the UI incorporates
-changes to be modeless, but no changes are required to this file.  You can find more information
-about this example in the [companion&nbsp;tutorial][tutorial-modeless].  A
-[second&nbsp;version][source-cast] of the modeless UI does include changes in this configuration
-file.
+[basic&nbsp;modal&nbsp;application][schema-modal].  This example builds on that, adding a resource
+that uses a complex key.  More information about this example can be found in the
+[companion&nbsp;tutorial][tutorial-cast].  We assume you are already familiar with the modal
+application, and we jump straight to the differences between this depot schema and that one.  The
+tables and many of the documents are the same; nothing changes until we introduce documents for the
+cast table below.
 
     {
 
@@ -102,6 +103,40 @@ file.
           "with movie {
             id: id;
             title: title;
+          }",
+
+Our goal is to expose a row of the cast table as a resource of its own.  We need a mapping for the
+body of the HTTP requests and responses, and we need a mapping to assist with extracting key values
+from the URL that will name the root row.  The first mapping is for the body; it includes the role
+since we will want to pass that as part of PUT data.  The second mapping is nearly the same, but it
+leaves the role out since that does not appear in the key or URL.
+
+Both these expressions yield flat objects, that is fields are all primitive values and there are no
+nested objects or arrays.  The detail mapping just happens to be this way, but the key mapping needs
+to be this way.  The key template in the resource descriptor does not have any structure, just
+names, so the key mapping must also.  It is not ordinary to URL encode JSON objects or arrays in
+URLs, and Treode will not allow it, so the fields may take only primitive values.
+
+The key mapping is essential to using references in Treode.  Both the `actor` and `movie` column of
+the cast table are references to other tables, but Treode does not directly expose references in any
+way.  The keys of the target tables are primitives that do have a representation though, so the URL
+can use those key values to identify the rows and thereby identify the references.
+
+        castDetail:
+          "with cast
+          resolve actor by id
+          resolve movie by id {
+            movieId: movie.id;
+            actorId: actor.id;
+            role: role;
+          }",
+
+        castKey:
+          "with cast
+          resolve actor by id
+          resolve movie by id {
+            movieId: movie.id;
+            actorId: actor.id;
           }"
       },
 
@@ -137,6 +172,20 @@ file.
               delete: {}
             },
 
+We add a resource descriptor for the cast entity, which is much like the resource descriptors above,
+however this resource only supports PUT and DELETE.  PUT will allow the client to update the role
+name, and DELETE will allow the client to remove the actor from the movie and simultaneously remove
+the role from the actor.  Also different from the two resources above, the key template here names
+two fields, and it's no accident that those names match the fields of the key mapping from above.
+
+            { prefix: "/cast",
+              table: cast,
+              document: castDetail,
+              key: {name: id, document: castKey, template: "/<movieId>:<actorId>"},
+              put: {},
+              delete: {}
+            },
+
             { prefix: "/search",
               search: {
                 categories: {
@@ -145,6 +194,8 @@ file.
           ]}
       }}
 
+[schema-modal]: https://github.com/Treode/movies-example/blob/modal/master/movies-schema.json.md
+[tutorial-cast]: http://treode.com/tutorial/modeless.html#cast
 ## License
 
 Copyright 2013 Treode, Inc.
@@ -161,7 +212,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+[facebook-apps]: https://developers.facebook.com/apps "Facebook Apps"
+[facebook-login]: https://developers.facebook.com/docs/technical-guides/login/ "Facebook Login"
+[google-apis]: https://code.google.com/apis/console "Google APIs Console"
+[google-login]: https://developers.google.com/accounts/docs/OAuth2Login "Google Login"
+[oauth2]: http://oauth.net/2/ "OAuth2"
 [schema-modal]: https://github.com/Treode/movies-example/blob/modal/master/movies-schema.json.md "Schema for modal example"
-[schema-cast]: https://github.com/Treode/movies-example/blob/cast/master/movies-schema.json.md "Schema for cast example"
-[source-cast]: https://github.com/Treode/movies-example/tree/cast/master "Source for cast example"
-[tutorial-modeless]: http://treode.com/tutorial/modeless.html "Tutorial for modeless example"
+[tutorial-auth]: http://treode.com/tutorial/authorize.html "Tutorial for authorization example"

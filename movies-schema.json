@@ -93,6 +93,23 @@
       "with movie {
         id: id;
         title: title;
+      }",
+
+    castDetail:
+      "with cast
+      resolve actor by id
+      resolve movie by id {
+        movieId: movie.id;
+        actorId: actor.id;
+        role: role;
+      }",
+
+    castKey:
+      "with cast
+      resolve actor by id
+      resolve movie by id {
+        movieId: movie.id;
+        actorId: actor.id;
       }"
   },
 
@@ -124,6 +141,14 @@
             categories: {
               actors: {terms: actorTerms, result: actorSummary}}},
           post: {},
+          put: {},
+          delete: {}
+        },
+
+        { prefix: "/cast",
+          table: cast,
+          document: castDetail,
+          key: {name: id, document: castKey, template: "/<movieId>:<actorId>"},
           put: {},
           delete: {}
         },

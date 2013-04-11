@@ -18,8 +18,8 @@
 angular.module ("movies")
 
   .controller ("MovieCtrl", [
-    "$scope", "$location", "$routeParams", "Movie",
-    function ($scope, $location, $routeParams, Movie) {
+    "$scope", "$location", "$routeParams", "Movie", "Cast",
+    function ($scope, $location, $routeParams, Movie, Cast) {
 
       var noop = angular.noop;
 
@@ -74,9 +74,9 @@ angular.module ("movies")
 
       $scope.addCast = function() {
         var c = $scope.newCast;
-        Movie.put (
-          {movieId: $scope.movie.id},
-          {cast: {save: [{actorId: c.actorId, role: c.role}]}},
+        Cast.put (
+          {movieId: $scope.movie.id, actorId: c.actorId},
+          {role: c.role},
           noop,
           error);
         $scope.movie.cast.push (c);
@@ -92,12 +92,9 @@ angular.module ("movies")
       $scope.changeCastActor = function (index) {
         return function (previous) {
           var c = $scope.movie.cast [index];
-          Movie.put (
-            {movieId: $scope.movie.id},
-            {cast: {
-               save: [{actorId: c.actorId, role: c.role}],
-               remove: [{actorId: previous}]
-             }},
+          Cast.put (
+            {movieId: $scope.movie.id, actorId: previous},
+            {actorId: c.actorId, role: c.role},
             noop,
             error);
         };
@@ -105,20 +102,17 @@ angular.module ("movies")
 
       $scope.changeCastRole = function (index) {
         var c = $scope.movie.cast [index];
-        Movie.put (
-          {movieId: $scope.movie.id},
-          {cast: {
-              save: [{actorId: c.actorId, role: c.role}]
-          }},
+        Cast.put (
+          {movieId: $scope.movie.id, actorId: c.actorId},
+          {role: c.role},
           noop,
           error);
       };
 
       $scope.removeCast = function (index) {
         var c = $scope.movie.cast [index];
-        Movie.put (
-          {movieId: $scope.movie.id},
-          {cast: {remove: [{actorId: c.actorId}]}},
+        Cast.remove (
+          {movieId: $scope.movie.id, actorId: c.actorId},
           noop,
           error);
         $scope.movie.cast.splice (index, 1);

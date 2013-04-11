@@ -58,6 +58,10 @@ angular.module ("movies", ["treode", "ui", "ui.bootstrap"])
     return new Resource (store + "/movie", "/:movieId");
   }])
 
+  .factory ("Cast", ["TreodeResource", function (Resource) {
+    return new Resource (store + "/cast", "/:movieId\\::actorId");
+  }])
+
   .factory ("Search", ["TreodeResource", function (Resource) {
     return new Resource (store + "/search");
   }])
