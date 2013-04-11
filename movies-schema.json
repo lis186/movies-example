@@ -1,0 +1,138 @@
+{
+
+  name: "Movies",
+
+  keep: false,
+
+  tables: {
+
+    actor: {
+      handle: hE4F1,
+
+      columns: {
+        id:   {handle: hA282, type: id64, nullable: false, modifiable: false, default: =id64},
+        name: {handle: hE178, type: string, nullable: false}},
+
+      keys: {
+        id: {handle: hE29E, columns: [id]}}},
+
+    movie: {
+      handle: h7D46,
+
+      columns: {
+        id: {handle: h3E43, type: id64, nullable: false, modifiable: false, default: =id64},
+        title: {handle: hABB8, type: string, nullable: false}},
+
+      keys: {
+        id: {handle: hBC09, columns: [id]}}},
+
+    cast: {
+      handle: h7606,
+
+      columns: {
+        actor: {handle: h0310, type: actor, nullable: false},
+        movie:  {handle: h85AA, type: movie, nullable: false},
+        role:   {handle: h20AA, type: string, nullable: false}},
+
+      keys: {
+        id: {handle: hFD81, columns: [actor, movie]}}}},
+
+  documents: {
+
+    actorDetail:
+      "with actor {
+        id: id;
+        name: name;
+        roles: [
+          cast on actor by id
+          resolve movie by id {
+            movieId: movie.id;
+            title: movie.title;
+            role: role;
+          }]; }",
+
+    actorKey:
+      "with actor {
+        id: id;
+      }",
+
+    actorTerms:
+      "(F413) with actor {
+        name: name;
+      }",
+
+    actorSummary:
+      "with actor {
+        id: id;
+        name: name;
+      }",
+
+    movieDetail:
+      "with movie {
+        id: id;
+        title: title;
+        cast: [
+          cast on movie by id
+          resolve actor by id {
+            actorId: actor.id;
+            name: actor.name;
+            role: role;
+          }]; }",
+
+    movieKey:
+      "with movie {
+        id: id;
+      }",
+
+    movieTerms:
+      "(CA60) with movie {
+        title: title;
+      }",
+
+    movieSummary:
+      "with movie {
+        id: id;
+        title: title;
+      }"
+  },
+
+  hosts: {
+
+    movies.store.localhost: {
+
+      resources: [
+
+        { prefix: "/movie",
+          table: movie,
+          document: movieDetail,
+          key: {name: id, document: movieKey, template: "/<id>"},
+          get: {},
+          search: {
+            categories: {
+              movies: {terms: movieTerms, result: movieSummary}}},
+          post: {},
+          put: {},
+          delete: {}
+        },
+
+        { prefix: "/actor",
+          table: actor,
+          document: actorDetail,
+          key: {name: id, document: actorKey, template: "/<id>"},
+          get: {},
+          search: {
+            categories: {
+              actors: {terms: actorTerms, result: actorSummary}}},
+          post: {},
+          put: {},
+          delete: {}
+        },
+
+        { prefix: "/search",
+          search: {
+            categories: {
+              actors: {terms: actorTerms, result: actorSummary},
+              movies: {terms: movieTerms, result: movieSummary}}}}
+      ]}
+  }}
+
