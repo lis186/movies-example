@@ -37,7 +37,7 @@ angular.module ("movies")
       $scope.movie = Movie.get ({movieId: $routeParams.movieId}, noop, error);
 
       $scope.remove = function() {
-        Movie.remove ({movieId: $scope.movie.id}, removed, error (true));
+        Movie.remove ({movieId: $scope.movie.id}, removed, error);
       };
 
       $scope.suggestActor = function (index) {
